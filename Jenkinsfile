@@ -2,30 +2,22 @@ pipeline {
     agent any
 
     stages {
-        stage('Setup Python Env') {
+        stage('Clone Repo') {
             steps {
-                bat 'python -m venv venv'
-                bat 'venv\\Scripts\\activate && pip install -r requirements.txt'
+                git 'https://github.com/your-username/your-repo.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'pip install -r requirements.txt'
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat 'venv\\Scripts\\activate && pytest --maxfail=1 --disable-warnings --html=report.html'
+                sh 'pytest --maxfail=1 --disable-warnings -v'
             }
-        }
-    }
-
-    post {
-        always {
-            publishHTML([
-                allowMissing: false,
-                alwaysLinkToLastBuild: true,
-                keepAll: true,
-                reportDir: '.',
-                reportFiles: 'report.html',
-                reportName: 'Test Report'
-            ])
         }
     }
 }
