@@ -21,10 +21,24 @@ pipeline {
             steps {
                 bat '''
                     call %VENV_DIR%\\Scripts\\activate
-                    python -m pytest --maxfail=1 --disable-warnings --html=report.html
+                    python -m pytest --maxfail=1 --disable-warnings --html=reports/report.html
                 '''
             }
         }
+
+        stage('Publish HTML Report') {
+            steps {
+                publishHTML(target: [
+                    reportDir: '.',
+                    reportFiles: 'report.html',
+                    reportName: 'Test Report',
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true,
+                    allowMissing: false
+                ])
+            }
+        }
+
     }
 
     post {
