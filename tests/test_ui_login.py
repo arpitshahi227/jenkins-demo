@@ -1,5 +1,6 @@
 from pages.login_page import LoginPage
-from utils.config import BASE_UI_URL
+
+BASE_UI_URL = "https://opensource-demo.orangehrmlive.com"
 
 def test_valid_login(driver):
     login = LoginPage(driver)
