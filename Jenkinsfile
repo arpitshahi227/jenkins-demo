@@ -2,30 +2,28 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repository') {
+        stage('Create Virtual Env') {
             steps {
-                git 'https://github.com/arpitshahi227/jenkins-demo.git'
+                bat 'python -m venv venv'
             }
         }
 
-        stage('Setup Python Environment') {
+        stage('Install Dependencies') {
             steps {
-                sh 'python3 -m venv venv'
-                sh './venv/bin/pip install --upgrade pip'
-                sh './venv/bin/pip install -r requirements.txt'
+                bat '.\\venv\\Scripts\\pip install -r requirements.txt'
             }
         }
 
-        stage('Run Pytest') {
+        stage('Run Tests') {
             steps {
-                sh './venv/bin/pytest tests/ --junitxml=report.xml'
+                bat '.\\venv\\Scripts\\pytest -v tests\\ --junitxml=report.xml'
             }
         }
-    }
 
-    post {
-        always {
-            junit 'report.xml'
+        stage('Publish Results') {
+            steps {
+                junit 'report.xml'
+            }
         }
     }
 }
