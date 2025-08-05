@@ -21,7 +21,7 @@ pipeline {
             steps {
                 bat '''
                     call %VENV_DIR%\\Scripts\\activate
-                    pytest --maxfail=1 --disable-warnings --html=report.html
+                    python -m pytest --maxfail=1 --disable-warnings --html=report.html
                 '''
             }
         }
