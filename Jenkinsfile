@@ -1,23 +1,44 @@
 pipeline {
     agent any
 
+    tools {
+        python 'Python310' // Jenkins Global Tool Config me set hona chahiye
+    }
+
     stages {
         stage('Clone Repo') {
             steps {
-                git 'https://github.com/arpitshahi227/jenkins-demo.git'
+                // Git automatically pulls if SCM configured, so optional
+                echo 'Code pulled from GitHub'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Create Virtual Env & Install Deps') {
             steps {
-                sh 'pip install -r requirements.txt'
+                bat '''
+                    python -m venv venv
+                    call venv\\Scripts\\activate
+                    pip install --upgrade pip
+                    pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                sh 'pytest --maxfail=1 --disable-warnings -v'
+                bat '''
+                    call venv\\Scripts\\activate
+                    pytest --maxfail=1 --disable-warnings --html=report.html
+                '''
             }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: 'report.html', allowEmptyArchive: true
+            junit '**/test-results/*.xml' // if pytest junitxml used
+            cleanWs()
         }
     }
 }
