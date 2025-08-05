@@ -2,30 +2,30 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/arpitshahi227/jenkins-demo.git'
-            }
-        }
-
-        stage('Setup Python Environment') {
+        stage('Setup Python Env') {
             steps {
                 bat 'python -m venv venv'
-                bat '.\\venv\\Scripts\\pip install --upgrade pip'
-                bat '.\\venv\\Scripts\\pip install -r requirements.txt'
+                bat 'venv\\Scripts\\activate && pip install -r requirements.txt'
             }
         }
 
-        stage('Run Pytest') {
+        stage('Run Tests') {
             steps {
-                bat '.\\venv\\Scripts\\pytest tests/ --junitxml=report.xml'
+                bat 'venv\\Scripts\\activate && pytest --maxfail=1 --disable-warnings --html=report.html'
             }
         }
     }
 
     post {
         always {
-            junit 'report.xml'
+            publishHTML([
+                allowMissing: false,
+                alwaysLinkToLastBuild: true,
+                keepAll: true,
+                reportDir: '.',
+                reportFiles: 'report.html',
+                reportName: 'Test Report'
+            ])
         }
     }
 }
